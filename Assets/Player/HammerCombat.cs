@@ -20,6 +20,12 @@ public class HammerCombat : MonoBehaviour
     private const float BASIC_ATTACK_ANIMATION_TIMEOUT = 0.5f;
     private const float BASIC_ATTACK_DELAY = 0.35f;
 
+    [SerializeField]
+    private Transform damageOrigin;
+
+    [SerializeField]
+    private float damageRadius;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -49,11 +55,18 @@ public class HammerCombat : MonoBehaviour
         }
 
         timeSinceLastBasicAttack += Time.deltaTime;
+
+
+    }
+
+    private bool IsAttacking() {
+        return attackAnimState == CurrentAttackAnim.Attack || attackAnimState == CurrentAttackAnim.Attack2;
     }
 
     private void BasicAttack() {
         timeSinceLastBasicAttack = 0;
         UpdateBasicAttackAnimation();
+        DetectColliders();
     }
 
     private void UpdateBasicAttackAnimation() {
@@ -70,6 +83,23 @@ public class HammerCombat : MonoBehaviour
             animator.SetTrigger("Attack");
             attackAnimState = CurrentAttackAnim.Attack;
             break;
+        }
+    }
+
+    public void OnDrawGizmosSelected() {
+        Gizmos.color = Color.blue;
+        Vector3 position = damageOrigin == null ? Vector3.zero : damageOrigin.position;
+        Gizmos.DrawWireSphere(position, damageRadius);
+    }
+
+    public void DetectColliders() {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(damageOrigin.position, damageRadius);
+        foreach (Collider2D collider in colliders) {
+            IEnemy enemyComponent = collider.GetComponent(typeof(IEnemy)) as IEnemy;
+            if(enemyComponent == null) 
+                continue;
+
+            Debug.Log(collider.name);
         }
     }
 }
