@@ -365,16 +365,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 2
-  invulnerabilityTimeAfterDamage: 1.6
+  invulnerabilityTimeAfterDamage: 1.8
   onDamageEvent:
     m_PersistentCalls:
       m_Calls: []
   onHealingEvent:
     m_PersistentCalls:
       m_Calls: []
-  dontDieFromFullHealth: 1
-  healthToBeLeftWithFromFull: 1
-  fromFullInvulnerabilityTime: 1.6
 --- !u!114 &5312106411869142183
 MonoBehaviour:
   m_ObjectHideFlags: 0

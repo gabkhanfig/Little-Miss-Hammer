@@ -13,7 +13,7 @@ public class Health : MonoBehaviour
     public int currentHealth { get; private set; } = 0;
 
     [SerializeField, Tooltip("Measured in seconds")] 
-    private float invulnerabilityTimeAfterDamage = 0.35f;
+    private float afterDamageInvulnerabilityTime = 0.35f;
 
     [SerializeField, Tooltip("Arguments: Int32 = damage amount, Vector2 = damage direction, Boolean = is dead")] 
     private UnityEvent<int, Vector2, bool> onDamageEvent = null;
@@ -21,20 +21,22 @@ public class Health : MonoBehaviour
     [SerializeField, Tooltip("Arguments: Int32 = healing amount")] 
     private UnityEvent<int> onHealingEvent = null;
 
-    [HideInInspector] 
+    [HideInInspector, Tooltip("If set to true, this health component's owner will survive a killing blow from full health with the 1 health, and set to be invulnerable for fromFullInvulnerabilityTime")] 
     public bool dontDieFromFullHealth {get; private set; } = false;
 
-    [HideInInspector, Tooltip("")] 
-    public int healthToBeLeftWithFromFull {get; private set; } = 1;
-
-    [HideInInspector, Tooltip("")] 
+    [HideInInspector, Tooltip("The duration of invulnerability after surviving an attack from full health. This value will always be greater than or equal to invulnerabilityTimeAfterDamage")] 
     public float fromFullInvulnerabilityTime {get; private set; } = 1.5f;
+
+    [HideInInspector]
+    public bool isInvulnerable {get; private set; } = false;
+    private float invulnerabilityTimeRemaining = 0;
 
 
     public int GetMaxHealth() {return maxHealth;}
     public void _HealthEditorSetDontDieFromFullHealth(bool value) {dontDieFromFullHealth = value;}
-    public void _HealthEditorSetHealthToBeLeftWithFromNull(int value) {healthToBeLeftWithFromFull = value;}
-    public void _HealthEditorSetFromFullInvulnerabilityTime(float value) {fromFullInvulnerabilityTime = value;}
+    public void _HealthEditorSetFromFullInvulnerabilityTime(float value) {
+        fromFullInvulnerabilityTime = Mathf.Max(value, afterDamageInvulnerabilityTime);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -44,19 +46,21 @@ public class Health : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {   
+    {
+        if(invulnerabilityTimeRemaining > 0) {
+            invulnerabilityTimeRemaining -= Time.deltaTime;
+            if(invulnerabilityTimeRemaining <= 0) {
+                invulnerabilityTimeRemaining = 0;
+                isInvulnerable = false;
+            }
+        }
     }
 
     private void OnValidate() {
         Debug.AssertFormat(maxHealth > 0, "Health script maxHealth must be greater than 0! Value is {0}", maxHealth);
         if(dontDieFromFullHealth) {
-            Debug.AssertFormat(healthToBeLeftWithFromFull < maxHealth, "Health script healthToBeLeftWithFromNull must be less than max health! Value is {0}", healthToBeLeftWithFromFull);
-            Debug.AssertFormat(healthToBeLeftWithFromFull > 0, "Health script healthToBeLeftWithFromNull must be greater than 0! Value is {0}", healthToBeLeftWithFromFull);
             Debug.AssertFormat(fromFullInvulnerabilityTime > 0, "Health script fromFullInvulnerabilityTime must be greater than 0! Value is {0}", fromFullInvulnerabilityTime);
         }
-        
-        // For some reason doesn't update correctly when changing fromFullInvulnerabilityTime itself?
-        fromFullInvulnerabilityTime = Mathf.Max(fromFullInvulnerabilityTime, invulnerabilityTimeAfterDamage);
     }
 
     public void Damage(int amount, Vector2 direction) {
@@ -64,12 +68,24 @@ public class Health : MonoBehaviour
         direction.Normalize();
         if(currentHealth <= 0) return;
 
+        bool isFullHealth = currentHealth == maxHealth;
+        bool isKillingBlow = (currentHealth - amount) <= 0;
+        if(dontDieFromFullHealth && isFullHealth && isKillingBlow) {
+            int amountDealt = maxHealth - 1;
+            currentHealth = 1;
+
+            onDamageEvent?.Invoke(amountDealt, direction, false);
+            SetTemporaryInvulnerability(fromFullInvulnerabilityTime);
+            return;
+        }
+
         currentHealth -= amount;
         bool isDead = currentHealth <= 0;
         if(isDead)
             currentHealth = 0;
 
         onDamageEvent?.Invoke(amount, direction, isDead);
+        SetTemporaryInvulnerability(afterDamageInvulnerabilityTime);
     }
 
     public void Heal(int amount) {
@@ -87,6 +103,11 @@ public class Health : MonoBehaviour
 
         onHealingEvent?.Invoke(amountHealed);
     }
+
+    public void SetTemporaryInvulnerability(float duration) {
+        invulnerabilityTimeRemaining = Mathf.Max(invulnerabilityTimeRemaining, duration);
+        isInvulnerable = true;
+    }
 }
 
 #if UNITY_EDITOR
@@ -99,7 +120,6 @@ public class HealthEditor : Editor{
         health._HealthEditorSetDontDieFromFullHealth(GUILayout.Toggle(health.dontDieFromFullHealth, "Dont Die From Full Health"));
 
         if(health.dontDieFromFullHealth) {
-            health._HealthEditorSetHealthToBeLeftWithFromNull(EditorGUILayout.IntField("Health To Be Left With From Null", health.healthToBeLeftWithFromFull));
             health._HealthEditorSetFromFullInvulnerabilityTime(EditorGUILayout.FloatField("From Full Invulnerability Time", health.fromFullInvulnerabilityTime));
         }
     }
