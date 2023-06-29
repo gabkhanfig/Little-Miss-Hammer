@@ -99,7 +99,11 @@ public class HammerCombat : MonoBehaviour
             if(enemyComponent == null) 
                 continue;
 
-            Debug.Log(collider.name);
+            Health enemyHealth = enemyComponent.GetHealthComponent();
+            Debug.Assert(enemyHealth != null, "Enemy must have a health component");
+
+            Vector2 damageDirection = ( new Vector2(collider.transform.position.x, collider.transform.position.y) - new Vector2(damageOrigin.position.x, damageOrigin.position.y)).normalized;
+            enemyHealth.Damage(1, damageDirection);
         }
     }
 }
