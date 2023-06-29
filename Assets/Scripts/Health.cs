@@ -41,6 +41,7 @@ public class Health : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        currentHealth = maxHealth;
         Debug.AssertFormat(maxHealth > 0, "Health script maxHealth must be greater than 0 on start. Value is {0}", maxHealth);
     }
 
