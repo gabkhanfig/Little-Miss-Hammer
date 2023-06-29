@@ -74,7 +74,6 @@ public class Health : MonoBehaviour
         if(dontDieFromFullHealth && isFullHealth && isKillingBlow) {
             int amountDealt = maxHealth - 1;
             currentHealth = 1;
-
             onDamageEvent?.Invoke(amountDealt, direction, false);
             SetTemporaryInvulnerability(fromFullInvulnerabilityTime);
             return;

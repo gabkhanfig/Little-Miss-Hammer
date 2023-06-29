@@ -8,19 +8,19 @@ public class KnockbackImpulse : MonoBehaviour
     [SerializeField]
     private Rigidbody2D rb2d;
     [SerializeField]
-    private float strength = 25;
+    private float strength = 20;
     [SerializeField]
-    private float delay = 0.05f;
+    private float delay = 0.1f;
 
     [SerializeField]
     private UnityEvent onBeginKnockback;
     [SerializeField]
     private UnityEvent onEndKnockback;
 
-    public void Knockback(Vector2 direction) {
+    public void Knockback(Vector2 direction, float forceMultiplier = 1) {
         StopAllCoroutines();
         onBeginKnockback?.Invoke();
-        rb2d.AddForce(direction * strength, ForceMode2D.Impulse);
+        rb2d.AddForce(direction * strength * forceMultiplier, ForceMode2D.Impulse);
         StartCoroutine(Reset());
     }
 

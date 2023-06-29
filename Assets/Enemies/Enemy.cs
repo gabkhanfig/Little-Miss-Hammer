@@ -30,7 +30,8 @@ public class Enemy : MonoBehaviour, IEnemy
 
     public void OnDamageEvent(int damageAmount, Vector2 damageDirection, bool isDead) {
         Debug.LogFormat("{0} health remaining", healthComponent.currentHealth);
-        knockbackComponent?.Knockback(damageDirection);
+        float knockbackMultiplier = isDead ? 4 : 1;
+        knockbackComponent?.Knockback(damageDirection, knockbackMultiplier);
     }
 
     public void OnHealingEvent(int healingAmount) {

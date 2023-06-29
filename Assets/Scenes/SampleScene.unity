@@ -424,7 +424,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bcb27bb381da40489cb49833c2dab05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
+  maxHealth: 100
   afterDamageInvulnerabilityTime: 0.35
   onDamageEvent:
     m_PersistentCalls:
@@ -578,6 +578,10 @@ PrefabInstance:
     - target: {fileID: 1672582238904484387, guid: 61a298be300290c4e96db9126cd455bc, type: 3}
       propertyPath: m_Mass
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2388547361112813728, guid: 61a298be300290c4e96db9126cd455bc, type: 3}
+      propertyPath: m_FlipX
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2388547361112813728, guid: 61a298be300290c4e96db9126cd455bc, type: 3}
       propertyPath: m_Size.x
