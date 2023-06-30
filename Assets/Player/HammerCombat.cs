@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-enum CurrentAttackAnim {
+public enum CurrentAttackAnim {
     Idle,
     Attack,
+    Idle2,
     Attack2
 
 }
@@ -16,8 +17,6 @@ public class HammerCombat : MonoBehaviour
     private float timeSinceLastBasicAttack = 0;
     private float basicAttackDelayTime = 0;
     private bool canUseBasicAttack = true;
-
-    private const float BASIC_ATTACK_ANIMATION_TIMEOUT = 0.5f;
     private const float BASIC_ATTACK_DELAY = 0.35f;
 
     [SerializeField]
@@ -35,7 +34,7 @@ public class HammerCombat : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(canUseBasicAttack && Input.GetMouseButton(0)) {
+        if(!IsAttacking() && Input.GetMouseButton(0)) {
             BasicAttack();
             basicAttackDelayTime = 0;
             canUseBasicAttack = false;
@@ -47,16 +46,14 @@ public class HammerCombat : MonoBehaviour
             basicAttackDelayTime = 0;
         }
 
-        else {
-            if(timeSinceLastBasicAttack > BASIC_ATTACK_ANIMATION_TIMEOUT && attackAnimState != CurrentAttackAnim.Idle) {
-                attackAnimState = CurrentAttackAnim.Idle;
-                animator.SetTrigger("Idle");
-            }
-        }
-
         timeSinceLastBasicAttack += Time.deltaTime;
 
 
+    }
+
+    public void SetAttackAnimState(CurrentAttackAnim newAnimState) {
+        Debug.Log(newAnimState.ToString());
+        attackAnimState = newAnimState;
     }
 
     private bool IsAttacking() {
@@ -73,15 +70,9 @@ public class HammerCombat : MonoBehaviour
         switch(attackAnimState) {
             case CurrentAttackAnim.Idle:
             animator.SetTrigger("Attack");
-            attackAnimState = CurrentAttackAnim.Attack;
             break;
-            case CurrentAttackAnim.Attack:
+            case CurrentAttackAnim.Idle2:
             animator.SetTrigger("Attack2");
-            attackAnimState = CurrentAttackAnim.Attack2;
-            break;
-            case CurrentAttackAnim.Attack2:
-            animator.SetTrigger("Attack");
-            attackAnimState = CurrentAttackAnim.Attack;
             break;
         }
     }
