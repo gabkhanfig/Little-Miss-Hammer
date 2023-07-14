@@ -16,7 +16,7 @@ public class HammerCombat : MonoBehaviour
     private CurrentAttackAnim attackAnimState = CurrentAttackAnim.Idle;
     private float timeSinceLastBasicAttack = 0;
     private float basicAttackDelayTime = 0;
-    private bool canUseBasicAttack = true;
+    //private bool canUseBasicAttack = true;
     private const float BASIC_ATTACK_DELAY = 0.35f;
 
     [SerializeField]
@@ -37,12 +37,12 @@ public class HammerCombat : MonoBehaviour
         if(!IsAttacking() && Input.GetMouseButton(0)) {
             BasicAttack();
             basicAttackDelayTime = 0;
-            canUseBasicAttack = false;
+            //canUseBasicAttack = false;
         }
 
         basicAttackDelayTime += Time.deltaTime;
         if(basicAttackDelayTime >= BASIC_ATTACK_DELAY) {
-            canUseBasicAttack = true;
+            //canUseBasicAttack = true;
             basicAttackDelayTime = 0;
         }
 
@@ -52,7 +52,7 @@ public class HammerCombat : MonoBehaviour
     }
 
     public void SetAttackAnimState(CurrentAttackAnim newAnimState) {
-        Debug.Log(newAnimState.ToString());
+        //Debug.Log(newAnimState.ToString());
         attackAnimState = newAnimState;
     }
 
